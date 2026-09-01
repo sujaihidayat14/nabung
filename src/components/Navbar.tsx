@@ -121,8 +121,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <h1 className="font-bold text-slate-900 text-sm sm:text-base md:text-lg leading-tight tracking-tight truncate">
                   {school.name}
                 </h1>
-                <span className="hidden lg:inline-block px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-800 rounded-md border border-emerald-200">
-                  RESMI
+                <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-800 rounded-md border border-amber-200">
+                  BETA
                 </span>
               </div>
               <p className="text-[11px] sm:text-xs text-slate-500 truncate hidden sm:block">
