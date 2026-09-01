@@ -147,10 +147,16 @@ export const ReportService = {
       theme: 'grid',
       headStyles: {
         fillColor: [20, 83, 45], // Emerald dark
-        textColor: 255,
+        textColor: [255, 255, 255],
         fontStyle: 'bold',
         fontSize: 8.5,
         halign: 'center',
+      },
+      footStyles: {
+        fillColor: [240, 248, 242],
+        textColor: [20, 60, 35],
+        fontStyle: 'bold',
+        fontSize: 8.5,
       },
       styles: {
         fontSize: 8,
@@ -169,11 +175,15 @@ export const ReportService = {
       },
       foot: [
         [
-          { content: 'TOTAL KAS HARIAN', colSpan: 6, styles: { halign: 'right', fontStyle: 'bold' } },
+          {
+            content: 'TOTAL KAS HARIAN',
+            colSpan: 6,
+            styles: { halign: 'right', fontStyle: 'bold', fillColor: [20, 83, 45], textColor: [255, 255, 255] },
+          },
           {
             content: `+ ${formatRupiah(totalSetor)}\n- ${formatRupiah(totalTarik)}\nNet: ${formatRupiah(netChange)}`,
             colSpan: 3,
-            styles: { halign: 'left', fontStyle: 'bold', fillColor: [240, 245, 240] },
+            styles: { halign: 'left', fontStyle: 'bold', fillColor: [240, 248, 242], textColor: [15, 60, 35] },
           },
         ],
       ],
@@ -308,10 +318,16 @@ export const ReportService = {
       theme: 'grid',
       headStyles: {
         fillColor: [15, 83, 50],
-        textColor: 255,
+        textColor: [255, 255, 255],
         fontStyle: 'bold',
         fontSize: 8.5,
         halign: 'center',
+      },
+      footStyles: {
+        fillColor: [20, 83, 45],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 8.5,
       },
       styles: {
         fontSize: 8,
@@ -332,11 +348,27 @@ export const ReportService = {
       },
       foot: [
         [
-          { content: 'TOTAL KESELURUHAN', colSpan: 7, styles: { halign: 'right', fontStyle: 'bold' } },
-          { content: formatRupiah(grandDeposit), styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 253, 244] } },
-          { content: formatRupiah(grandWithdraw), styles: { halign: 'right', fontStyle: 'bold', fillColor: [254, 242, 242] } },
-          { content: formatRupiah(grandBalance), styles: { halign: 'right', fontStyle: 'bold', fillColor: [236, 253, 245] } },
-          { content: `${filteredStudents.length} Siswa`, styles: { halign: 'center', fontStyle: 'bold' } },
+          {
+            content: 'TOTAL KESELURUHAN',
+            colSpan: 7,
+            styles: { halign: 'right', fontStyle: 'bold', fillColor: [20, 83, 45], textColor: [255, 255, 255] },
+          },
+          {
+            content: `+ ${formatRupiah(grandDeposit)}`,
+            styles: { halign: 'right', fontStyle: 'bold', fillColor: [230, 248, 235], textColor: [15, 83, 50] },
+          },
+          {
+            content: `- ${formatRupiah(grandWithdraw)}`,
+            styles: { halign: 'right', fontStyle: 'bold', fillColor: [254, 226, 226], textColor: [185, 28, 28] },
+          },
+          {
+            content: formatRupiah(grandBalance),
+            styles: { halign: 'right', fontStyle: 'bold', fillColor: [209, 250, 229], textColor: [6, 78, 59] },
+          },
+          {
+            content: `${filteredStudents.length} Siswa`,
+            styles: { halign: 'center', fontStyle: 'bold', fillColor: [20, 83, 45], textColor: [255, 255, 255] },
+          },
         ],
       ],
     });

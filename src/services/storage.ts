@@ -11,17 +11,17 @@ const STORAGE_KEYS = {
 };
 
 export const DEFAULT_SCHOOL_PROFILE: SchoolProfile = {
-  name: 'SDN 5 JURIT BARU',
-  subTitle: 'DINAS PENDIDIKAN DAN KEBUDAYAAN KABUPATEN LOMBOK TIMUR',
+  name: 'SD NEGERI 5 JURIT BARU',
+  subTitle: 'PEMERINTAH KABUPATEN LOMBOK TIMUR - DINAS PENDIDIKAN DAN KEBUDAYAAN',
   npsn: '50205842',
-  address: 'Jl. Pariwisata Otak Kokok Joben, Desa Jurit Baru',
-  district: 'Kec. Pringgasela',
-  regency: 'Kab. Lombok Timur',
+  address: 'Jl. Rinjani Selak Aik Desa Jurit Baru',
+  district: 'Kecamatan Pringgasela',
+  regency: 'Kabupaten Lombok Timur',
   province: 'Nusa Tenggara Barat (NTB)',
-  headmaster: 'H. Lalu Sudirman, S.Pd., M.Pd.',
-  headmasterNip: '19740512 199803 1 004',
-  treasurer: 'Baiq Nurul Hidayati, S.Pd.',
-  treasurerNip: '19880914 201101 2 008',
+  headmaster: 'ABD. RAHMAN, S.Pd',
+  headmasterNip: '196612311988031295',
+  treasurer: 'H. SUJAI, S.Pd',
+  treasurerNip: '196812311994031082',
   phone: '0819-3678-9012',
   email: 'sdn5juritbaru@gmail.com',
 };
@@ -286,7 +286,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     currentBalance: 145000,
     date: new Date(Date.now() - 3600000 * 4).toISOString(),
     note: 'Setoran tabungan harian senin',
-    officerName: 'Baiq Nurul Hidayati, S.Pd.',
+    officerName: 'H. SUJAI, S.Pd',
     waNotificationStatus: 'sent',
     waSentAt: new Date(Date.now() - 3600000 * 4).toISOString(),
     syncedToSheets: true,
@@ -304,7 +304,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     currentBalance: 210000,
     date: new Date(Date.now() - 3600000 * 3).toISOString(),
     note: 'Setoran mingguan',
-    officerName: 'Baiq Nurul Hidayati, S.Pd.',
+    officerName: 'H. SUJAI, S.Pd',
     waNotificationStatus: 'sent',
     waSentAt: new Date(Date.now() - 3600000 * 3).toISOString(),
     syncedToSheets: true,
@@ -322,7 +322,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     currentBalance: 380000,
     date: new Date(Date.now() - 3600000 * 2).toISOString(),
     note: 'Setoran hasil jualan karya seni',
-    officerName: 'Baiq Nurul Hidayati, S.Pd.',
+    officerName: 'H. SUJAI, S.Pd',
     waNotificationStatus: 'sent',
     waSentAt: new Date(Date.now() - 3600000 * 2).toISOString(),
     syncedToSheets: true,
@@ -340,7 +340,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     currentBalance: 415000,
     date: new Date(Date.now() - 3600000 * 1).toISOString(),
     note: 'Penarikan untuk beli buku gambar dan krayon',
-    officerName: 'Baiq Nurul Hidayati, S.Pd.',
+    officerName: 'H. SUJAI, S.Pd',
     waNotificationStatus: 'sent',
     waSentAt: new Date(Date.now() - 3600000 * 1).toISOString(),
     syncedToSheets: true,
@@ -358,7 +358,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     currentBalance: 1450000,
     date: new Date(Date.now() - 86400000 * 1).toISOString(),
     note: 'Setoran saku bulanan',
-    officerName: 'Baiq Nurul Hidayati, S.Pd.',
+    officerName: 'H. SUJAI, S.Pd',
     waNotificationStatus: 'sent',
     waSentAt: new Date(Date.now() - 86400000 * 1).toISOString(),
     syncedToSheets: true,
@@ -484,7 +484,25 @@ export const StorageService = {
         this.saveSchoolProfile(DEFAULT_SCHOOL_PROFILE);
         return DEFAULT_SCHOOL_PROFILE;
       }
-      return JSON.parse(data);
+      const parsed: SchoolProfile = JSON.parse(data);
+      // Auto-migrate if using initial mock names
+      if (!parsed.headmaster || parsed.headmaster.includes('Sudirman') || parsed.treasurer.includes('Baiq Nurul')) {
+        const updated: SchoolProfile = {
+          ...parsed,
+          name: 'SD NEGERI 5 JURIT BARU',
+          subTitle: 'PEMERINTAH KABUPATEN LOMBOK TIMUR - DINAS PENDIDIKAN DAN KEBUDAYAAN',
+          address: 'Jl. Rinjani Selak Aik Desa Jurit Baru',
+          district: 'Kecamatan Pringgasela',
+          regency: 'Kabupaten Lombok Timur',
+          headmaster: 'ABD. RAHMAN, S.Pd',
+          headmasterNip: '196612311988031295',
+          treasurer: 'H. SUJAI, S.Pd',
+          treasurerNip: '196812311994031082',
+        };
+        this.saveSchoolProfile(updated);
+        return updated;
+      }
+      return parsed;
     } catch {
       return DEFAULT_SCHOOL_PROFILE;
     }
