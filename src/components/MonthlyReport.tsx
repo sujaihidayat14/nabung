@@ -292,8 +292,8 @@ export const MonthlyReport: React.FC<MonthlyReportProps> = ({
         </div>
       </div>
 
-      {/* Students Monthly Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      {/* Students Monthly Table & Mobile Cards */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="p-4 border-b border-slate-200 flex items-center justify-between">
           <h3 className="font-bold text-slate-900 text-xs sm:text-sm">
             Daftar Tabungan Siswa — Periode {monthObj.label} {selectedYear}
@@ -303,18 +303,19 @@ export const MonthlyReport: React.FC<MonthlyReportProps> = ({
           </span>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
               <tr>
-                <th className="py-3 px-4 w-12 text-center">No</th>
-                <th className="py-3 px-4">Nama Siswa / NISN</th>
-                <th className="py-3 px-4">Kelas</th>
-                <th className="py-3 px-4">Wali Murid / WA</th>
-                <th className="py-3 px-4 text-right">Setor ({monthObj.label})</th>
-                <th className="py-3 px-4 text-right">Tarik ({monthObj.label})</th>
-                <th className="py-3 px-4 text-right">Saldo Akhir Terkini</th>
-                <th className="py-3 px-4 text-center">Broadcast WA</th>
+                <th className="py-2.5 px-4 w-12 text-center">No</th>
+                <th className="py-2.5 px-4">Nama Siswa / NISN</th>
+                <th className="py-2.5 px-4">Kelas</th>
+                <th className="py-2.5 px-4">Wali Murid / WA</th>
+                <th className="py-2.5 px-4 text-right">Setor ({monthObj.label})</th>
+                <th className="py-2.5 px-4 text-right">Tarik ({monthObj.label})</th>
+                <th className="py-2.5 px-4 text-right">Saldo Akhir Terkini</th>
+                <th className="py-2.5 px-4 text-center">Broadcast WA</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -322,38 +323,38 @@ export const MonthlyReport: React.FC<MonthlyReportProps> = ({
                 const { student, depositMonth, withdrawMonth, txCount } = item;
                 return (
                   <tr key={student.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-4 text-center font-medium text-slate-400">{idx + 1}</td>
-                    <td className="py-3 px-4">
+                    <td className="py-2.5 px-4 text-center font-medium text-slate-400">{idx + 1}</td>
+                    <td className="py-2.5 px-4">
                       <div className="font-bold text-slate-900">{student.name}</div>
                       <div className="text-[11px] text-slate-500 font-mono">
                         NISN: {student.nisn} • {txCount} mutasi
                       </div>
                     </td>
-                    <td className="py-3 px-4 font-semibold text-slate-800">
+                    <td className="py-2.5 px-4 font-semibold text-slate-800">
                       <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-md">
                         {student.className}
                       </span>
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-2.5 px-4">
                       <div className="font-semibold text-slate-800">{student.parentName}</div>
                       <div className="text-[11px] text-slate-500 font-mono">
                         {student.parentPhone || 'Belum ada WA'}
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-right font-bold text-emerald-700">
+                    <td className="py-2.5 px-4 text-right font-bold text-emerald-800 tabular-nums">
                       {depositMonth > 0 ? `+ ${formatRupiah(depositMonth)}` : '-'}
                     </td>
-                    <td className="py-3 px-4 text-right font-bold text-rose-700">
+                    <td className="py-2.5 px-4 text-right font-bold text-rose-800 tabular-nums">
                       {withdrawMonth > 0 ? `- ${formatRupiah(withdrawMonth)}` : '-'}
                     </td>
-                    <td className="py-3 px-4 text-right font-extrabold text-sm text-slate-900 text-emerald-900">
+                    <td className="py-2.5 px-4 text-right font-bold text-slate-900 text-emerald-900 tabular-nums">
                       {formatRupiah(student.balance)}
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-2.5 px-4 text-center">
                       <button
                         onClick={() => handleSendSingleMonthlyWA(item)}
                         disabled={!student.parentPhone}
-                        className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1 mx-auto transition-colors cursor-pointer"
+                        className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1 mx-auto transition-colors cursor-pointer"
                         title="Kirim Pesan Rekap Bulanan ke WhatsApp Orang Tua"
                       >
                         <Smartphone className="w-3 h-3" />
@@ -369,19 +370,75 @@ export const MonthlyReport: React.FC<MonthlyReportProps> = ({
                 <td colSpan={4} className="py-3 px-4 text-right">
                   TOTAL KESELURUHAN:
                 </td>
-                <td className="py-3 px-4 text-right text-emerald-800">
+                <td className="py-3 px-4 text-right text-emerald-800 tabular-nums">
                   + {formatRupiah(grandDepositMonth)}
                 </td>
-                <td className="py-3 px-4 text-right text-rose-800">
+                <td className="py-3 px-4 text-right text-rose-800 tabular-nums">
                   - {formatRupiah(grandWithdrawMonth)}
                 </td>
-                <td className="py-3 px-4 text-right text-base text-emerald-950 font-extrabold">
+                <td className="py-3 px-4 text-right text-base text-emerald-950 font-extrabold tabular-nums">
                   {formatRupiah(grandTotalBalance)}
                 </td>
                 <td></td>
               </tr>
             </tfoot>
           </table>
+        </div>
+
+        {/* Mobile View Cards */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {studentMonthlySummaries.map((item, idx) => {
+            const { student, depositMonth, withdrawMonth, txCount } = item;
+            return (
+              <div key={student.id} className="p-3.5 flex flex-col gap-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-bold text-slate-900 text-xs">
+                      {idx + 1}. {student.name}
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-mono">
+                      {student.className} • {txCount} mutasi
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="font-bold text-emerald-900 text-xs tabular-nums">
+                      {formatRupiah(student.balance)}
+                    </div>
+                    <div className="text-[10px] text-slate-400">Saldo Terkini</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2 rounded-lg border border-slate-100">
+                  <div>
+                    <span className="text-slate-500 block">Setoran:</span>
+                    <span className="font-bold text-emerald-800 tabular-nums">
+                      {depositMonth > 0 ? `+ ${formatRupiah(depositMonth)}` : '-'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Penarikan:</span>
+                    <span className="font-bold text-rose-800 tabular-nums">
+                      {withdrawMonth > 0 ? `- ${formatRupiah(withdrawMonth)}` : '-'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-1 text-xs">
+                  <div className="text-[11px] text-slate-600 font-mono truncate max-w-[180px]">
+                    WA: {student.parentPhone || 'Belum diisi'}
+                  </div>
+                  <button
+                    onClick={() => handleSendSingleMonthlyWA(item)}
+                    disabled={!student.parentPhone}
+                    className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white rounded-lg text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                  >
+                    <Smartphone className="w-3 h-3" />
+                    <span>Broadcast WA</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

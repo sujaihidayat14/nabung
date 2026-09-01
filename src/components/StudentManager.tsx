@@ -397,9 +397,10 @@ Bendahara Kas Tabungan ${school.name}`;
         />
       </div>
 
-      {/* Students Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* Students Table for Desktop & Card View for Mobile */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
               <tr>
@@ -452,16 +453,16 @@ Bendahara Kas Tabungan ${school.name}`;
                       <td className="py-3 px-4">
                         <div className="font-semibold text-slate-800">{student.parentName}</div>
                         <div className="text-[11px] text-slate-500 flex items-center gap-1 font-mono">
-                          <Smartphone className="w-3 h-3 text-emerald-600" />
+                          <Smartphone className="w-3.5 h-3.5 text-emerald-700" />
                           <span>{student.parentPhone || 'Belum diatur'}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <div className="font-extrabold text-slate-900 text-sm text-emerald-800">
+                        <div className="font-bold text-slate-900 text-sm text-emerald-900 tabular-nums">
                           {formatRupiah(student.balance)}
                         </div>
                         <div className="text-[10px] text-slate-400">
-                          Pass: <code className="bg-slate-100 px-1 rounded">{student.password || '123456'}</code>
+                          Pass: <code className="bg-slate-100 px-1 rounded font-mono">{student.password || '123456'}</code>
                         </div>
                       </td>
                       <td className="py-3 px-4">
@@ -469,15 +470,15 @@ Bendahara Kas Tabungan ${school.name}`;
                           <div>
                             <div className="flex justify-between text-[11px] font-medium text-slate-700 mb-0.5">
                               <span className="truncate max-w-[120px]">{student.savingGoal.label}</span>
-                              <span className="font-bold text-emerald-700">{targetPct}%</span>
+                              <span className="font-bold text-emerald-800 tabular-nums">{targetPct}%</span>
                             </div>
                             <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
                               <div
-                                className="bg-emerald-600 h-full rounded-full transition-all"
+                                className="bg-emerald-800 h-full rounded-full transition-all"
                                 style={{ width: `${targetPct}%` }}
                               ></div>
                             </div>
-                            <div className="text-[10px] text-slate-400 mt-0.5">
+                            <div className="text-[10px] text-slate-400 mt-0.5 tabular-nums">
                               Target: {formatRupiah(student.savingGoal.target)}
                             </div>
                           </div>
@@ -490,7 +491,7 @@ Bendahara Kas Tabungan ${school.name}`;
                           {/* Setor Cepat */}
                           <button
                             onClick={() => onQuickTransaction(student.id, 'deposit')}
-                            className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 transition-colors"
+                            className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg border border-emerald-200 transition-colors cursor-pointer"
                             title="Setor Tabungan"
                           >
                             <Plus className="w-3.5 h-3.5" />
@@ -499,7 +500,7 @@ Bendahara Kas Tabungan ${school.name}`;
                           {/* Tarik Cepat */}
                           <button
                             onClick={() => onQuickTransaction(student.id, 'withdraw')}
-                            className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg border border-rose-200 transition-colors"
+                            className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-lg border border-rose-200 transition-colors cursor-pointer"
                             title="Tarik Tabungan"
                           >
                             <Minus className="w-3.5 h-3.5" />
@@ -508,7 +509,7 @@ Bendahara Kas Tabungan ${school.name}`;
                           {/* Kirim Info WA */}
                           <button
                             onClick={() => handleSendWAInfo(student)}
-                            className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 transition-colors"
+                            className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg border border-emerald-200 transition-colors cursor-pointer"
                             title="Kirim Info Saldo ke WhatsApp Wali"
                           >
                             <Smartphone className="w-3.5 h-3.5" />
@@ -517,7 +518,7 @@ Bendahara Kas Tabungan ${school.name}`;
                           {/* Cetak Buku Tabungan PDF */}
                           <button
                             onClick={() => handlePrintPassbook(student)}
-                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 transition-colors"
+                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 transition-colors cursor-pointer"
                             title="Cetak Buku Mutasi Tabungan (PDF)"
                           >
                             <FileText className="w-3.5 h-3.5" />
@@ -529,7 +530,7 @@ Bendahara Kas Tabungan ${school.name}`;
                               setPasswordResetStudent(student);
                               setNewPasswordValue('');
                             }}
-                            className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg border border-amber-200 transition-colors"
+                            className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg border border-amber-200 transition-colors cursor-pointer"
                             title="Ubah Password Akun Siswa/Wali"
                           >
                             <KeyRound className="w-3.5 h-3.5" />
@@ -538,7 +539,7 @@ Bendahara Kas Tabungan ${school.name}`;
                           {/* Edit Siswa */}
                           <button
                             onClick={() => handleOpenEditModal(student)}
-                            className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200 transition-colors"
+                            className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg border border-blue-200 transition-colors cursor-pointer"
                             title="Edit Data Siswa"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -547,7 +548,7 @@ Bendahara Kas Tabungan ${school.name}`;
                           {/* Delete Siswa */}
                           <button
                             onClick={() => handleDeleteStudent(student)}
-                            className="p-1.5 bg-slate-100 hover:bg-rose-100 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                            className="p-1.5 bg-slate-100 hover:bg-rose-100 text-slate-400 hover:text-rose-700 rounded-lg transition-colors cursor-pointer"
                             title="Hapus Siswa"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -560,6 +561,117 @@ Bendahara Kas Tabungan ${school.name}`;
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Responsive Cards View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {filteredStudents.length === 0 ? (
+            <div className="py-8 text-center text-xs text-slate-400">
+              Tidak ada data siswa yang ditemukan.
+            </div>
+          ) : (
+            filteredStudents.map((student, idx) => (
+              <div key={student.id} className="p-3.5 flex flex-col gap-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                      <span>{idx + 1}. {student.name}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded font-bold ${
+                          student.gender === 'L' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800'
+                        }`}
+                      >
+                        {student.gender}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+                      NISN: {student.nisn} • {student.className}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="font-bold text-emerald-800 text-sm tabular-nums">
+                      {formatRupiah(student.balance)}
+                    </div>
+                    <div className="text-[10px] text-slate-400">
+                      Pass: <code className="bg-slate-100 px-1 rounded font-mono">{student.password || '123456'}</code>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs bg-slate-50 p-2 rounded-lg border border-slate-100">
+                  <div className="truncate">
+                    <span className="text-slate-500 text-[11px]">Wali: </span>
+                    <strong className="text-slate-800 font-semibold">{student.parentName || '-'}</strong>
+                  </div>
+                  <div className="text-[11px] text-slate-600 flex items-center gap-1 shrink-0 font-mono">
+                    <Smartphone className="w-3 h-3 text-emerald-700" />
+                    <span>{student.parentPhone || '-'}</span>
+                  </div>
+                </div>
+
+                {/* Mobile Action Buttons Bar */}
+                <div className="flex items-center justify-between gap-1 pt-1">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onQuickTransaction(student.id, 'deposit')}
+                      className="px-2.5 py-1.5 bg-emerald-50 text-emerald-800 font-bold rounded-lg border border-emerald-200 text-xs flex items-center gap-1 active:bg-emerald-100"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Setor</span>
+                    </button>
+                    <button
+                      onClick={() => onQuickTransaction(student.id, 'withdraw')}
+                      className="px-2.5 py-1.5 bg-rose-50 text-rose-800 font-bold rounded-lg border border-rose-200 text-xs flex items-center gap-1 active:bg-rose-100"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                      <span>Tarik</span>
+                    </button>
+                    <button
+                      onClick={() => handleSendWAInfo(student)}
+                      className="p-1.5 bg-emerald-50 text-emerald-800 rounded-lg border border-emerald-200"
+                      title="Kirim WA"
+                    >
+                      <Smartphone className="w-4 h-4 text-emerald-700" />
+                    </button>
+                    <button
+                      onClick={() => handlePrintPassbook(student)}
+                      className="p-1.5 bg-slate-100 text-slate-700 rounded-lg border border-slate-200"
+                      title="Cetak PDF"
+                    >
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        setPasswordResetStudent(student);
+                        setNewPasswordValue('');
+                      }}
+                      className="p-1.5 bg-amber-50 text-amber-800 rounded-lg border border-amber-200"
+                      title="Reset Password"
+                    >
+                      <KeyRound className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleOpenEditModal(student)}
+                      className="p-1.5 bg-blue-50 text-blue-800 rounded-lg border border-blue-200"
+                      title="Edit"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteStudent(student)}
+                      className="p-1.5 bg-slate-100 text-rose-600 rounded-lg"
+                      title="Hapus"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
