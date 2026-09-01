@@ -38,10 +38,9 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
   transactions,
   onRefresh,
 }) => {
-  const [activeTab, setActiveTab] = useState<'webhook' | 'export' | 'oauth'>('webhook');
+  const [activeTab, setActiveTab] = useState<'webhook' | 'export'>('webhook');
   const [config, setConfig] = useState<GoogleSheetsConfig>(StorageService.getSheetsConfig());
   const [webhookInput, setWebhookInput] = useState('');
-  const [spreadsheetIdInput, setSpreadsheetIdInput] = useState('');
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [copiedScript, setCopiedScript] = useState(false);
@@ -52,7 +51,6 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
       const current = StorageService.getSheetsConfig();
       setConfig(current);
       setWebhookInput(current.webhookUrl || '');
-      setSpreadsheetIdInput(current.spreadsheetId || '');
       setStatusMessage(null);
       setSyncElapsedMs(null);
     }
@@ -82,7 +80,7 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
     setIsSyncing(true);
     setStatusMessage({
       type: 'info',
-      text: 'Mengirim data ke Google Sheets melalui Webhook cepat...',
+      text: 'Mengirim data ke Google Sheets melalui Webhook...',
     });
 
     const startTime = performance.now();
@@ -166,78 +164,6 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
     document.body.removeChild(link);
   };
 
-  // 3. OAuth Connect
-  const handleConnectWithOAuth = async () => {
-    setIsSyncing(true);
-    setStatusMessage({ type: 'info', text: 'Membuka jendela otorisasi Google (maksimal 25 detik)...' });
-
-    try {
-      const clientId = '888395166187-demo.apps.googleusercontent.com';
-      const token = await GoogleSheetsService.initGoogleAuth(clientId);
-
-      setStatusMessage({ type: 'info', text: 'Membuat file spreadsheet baru di Google Drive Anda...' });
-      const newSheet = await GoogleSheetsService.createNewSpreadsheet(
-        token,
-        'Tabungan Siswa SDN 5 JURIT BARU - Resmi'
-      );
-
-      const updatedConfig: GoogleSheetsConfig = {
-        ...config,
-        connected: true,
-        accessToken: token,
-        spreadsheetId: newSheet.id,
-        spreadsheetUrl: newSheet.url,
-        lastSyncedAt: new Date().toISOString(),
-        syncMode: 'oauth',
-      };
-      StorageService.saveSheetsConfig(updatedConfig);
-      setConfig(updatedConfig);
-
-      setStatusMessage({ type: 'info', text: 'Mengunggah data siswa & mutasi...' });
-      await GoogleSheetsService.syncAllToGoogleSheets(token, newSheet.id, students, transactions);
-
-      setStatusMessage({
-        type: 'success',
-        text: 'Berhasil terhubung langsung via Google Sheets API! File siap dibuka.',
-      });
-      onRefresh();
-    } catch (err: unknown) {
-      setStatusMessage({
-        type: 'error',
-        text: err instanceof Error ? err.message : 'Gagal otorisasi. Gunakan metode Webhook Apps Script yang jauh lebih cepat dan tanpa batasan pop-up browser.',
-      });
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  // 4. Save manual ID
-  const handleSaveSpreadsheetId = () => {
-    if (!spreadsheetIdInput.trim()) return;
-
-    let cleanId = spreadsheetIdInput.trim();
-    if (cleanId.includes('/d/')) {
-      const match = cleanId.match(/\/d\/([a-zA-Z0-9-_]+)/);
-      if (match && match[1]) {
-        cleanId = match[1];
-      }
-    }
-
-    const updatedConfig: GoogleSheetsConfig = {
-      ...config,
-      spreadsheetId: cleanId,
-      spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${cleanId}/edit`,
-      connected: true,
-    };
-
-    StorageService.saveSheetsConfig(updatedConfig);
-    setConfig(updatedConfig);
-    setStatusMessage({
-      type: 'success',
-      text: 'ID Google Spreadsheet berhasil disimpan!',
-    });
-  };
-
   const handleExportBackup = () => {
     const jsonStr = StorageService.exportBackupJson();
     const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -288,23 +214,10 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-emerald-200 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+            className="text-emerald-200 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
-
-        {/* Why was it slow info callout */}
-        <div className="bg-amber-50 border-b border-amber-200/80 px-6 py-2.5 flex items-start gap-2 text-amber-900 text-xs">
-          <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-          <div>
-            <strong className="font-semibold">Mengapa sebelumnya terasa lambat?</strong>{' '}
-            Browser sering memblokir pop-up Google OAuth atau koneksi API Google membutuhkan verifikasi akun. Gunakan{' '}
-            <strong className="text-emerald-800 underline cursor-pointer" onClick={() => setActiveTab('webhook')}>
-              Metode Webhook 1 Detik
-            </strong>{' '}
-            atau <strong>Ekspor CSV Langsung</strong> untuk sinkronisasi instan tanpa hambatan!
-          </div>
         </div>
 
         {/* Navigation Tabs */}
@@ -318,7 +231,7 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
             }`}
           >
             <Zap className="w-3.5 h-3.5 text-amber-500" />
-            <span>⚡ Webhook Instan (1 Detik)</span>
+            <span>⚡ Sinkron Otomatis (Google Sheets Webhook)</span>
           </button>
 
           <button
@@ -330,19 +243,7 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
             }`}
           >
             <Download className="w-3.5 h-3.5 text-blue-500" />
-            <span>📥 Ekspor Langsung ke Sheets</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('oauth')}
-            className={`pb-2.5 px-3 font-bold border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'oauth'
-                ? 'border-emerald-600 text-emerald-800'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <Cloud className="w-3.5 h-3.5 text-emerald-600" />
-            <span>🔑 Google API OAuth</span>
+            <span>📥 Unduh File Spreadsheet / CSV & Cadangan</span>
           </button>
         </div>
 
@@ -382,13 +283,12 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
                     <h3 className="font-bold text-emerald-950 text-sm">Metode Webhook Google Apps Script</h3>
                   </div>
                   <span className="px-2 py-0.5 rounded-md bg-emerald-200 text-emerald-800 font-bold text-[10px]">
-                    Super Cepat & Stabil
+                    100% Gratis & Stabil
                   </span>
                 </div>
                 <p className="text-slate-600 text-xs leading-relaxed">
-                  Metode ini mengirim seluruh data siswa ({students.length} siswa) dan riwayat ({transactions.length}{' '}
-                  transaksi) langsung ke Google Sheets dalam <strong>&lt; 1 detik</strong> tanpa masalah izin pop-up browser
-                  atau token kedaluwarsa.
+                  Metode ini langsung mengirim seluruh data siswa ({students.length} siswa) dan riwayat ({transactions.length}{' '}
+                  transaksi) ke Google Sheets dalam <strong>&lt; 1 detik</strong> tanpa verifikasi Cloud yang rumit.
                 </p>
               </div>
 
@@ -396,7 +296,7 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                 <h4 className="font-bold text-slate-800 text-xs flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>Cara Pasang Sekali Saja (2 Menit):</span>
+                  <span>Panduan Mudah Pasang Sekali Saja (2 Menit):</span>
                 </h4>
                 <ol className="list-decimal list-inside space-y-2 text-slate-600 leading-relaxed text-xs">
                   <li>
@@ -415,7 +315,7 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
                     <strong>Apps Script</strong>.
                   </li>
                   <li>
-                    Hapus kode bawaan, lalu salin & tempel kode otomatis berikut:{' '}
+                    Hapus kode bawaan di sana, lalu klik tombol ini untuk salin kode otomatis:{' '}
                     <button
                       onClick={handleCopyCode}
                       className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-md font-bold text-[11px] ml-1 cursor-pointer transition-colors"
@@ -425,13 +325,13 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
                     </button>
                   </li>
                   <li>
-                    Klik <strong>Deploy (Terapkan)</strong> &gt; <strong>New Deployment (Penerapan Baru)</strong> &gt;
-                    Pilih <strong>Web App (Aplikasi Web)</strong>.
+                    Klik <strong>Deploy (Terapkan)</strong> di pojok kanan atas &gt; <strong>New Deployment (Penerapan Baru)</strong> &gt;
+                    Pilih jenis <strong>Web App (Aplikasi Web)</strong>.
                     <div className="text-[11px] text-slate-500 ml-4 mt-0.5">
-                      • Who has access: <strong>Anyone (Siapa saja)</strong>
+                      • Who has access (Siapa yang memiliki akses): <strong>Anyone (Siapa saja)</strong>
                     </div>
                   </li>
-                  <li>Klik Deploy, izinkan akses Google, lalu tempelkan URL Web App yang muncul ke kolom di bawah:</li>
+                  <li>Klik Deploy, lalu tempelkan URL Web App yang muncul (berakhiran <code>/exec</code>) ke kolom berikut:</li>
                 </ol>
               </div>
 
@@ -440,7 +340,7 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
                 <label className="font-bold text-slate-800 text-xs block">
                   Tempel URL Web App Google Apps Script Anda:
                 </label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="url"
                     placeholder="https://script.google.com/macros/s/.../exec"
@@ -451,13 +351,20 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
                   <button
                     onClick={handleSaveAndSyncWebhook}
                     disabled={isSyncing}
-                    className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-xs disabled:opacity-50 shrink-0"
+                    className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs disabled:opacity-50 shrink-0"
                   >
                     <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
                     <span>{isSyncing ? 'Menyinkronkan...' : '⚡ Sinkronkan Sekarang'}</span>
                   </button>
                 </div>
               </div>
+
+              {config.lastSyncedAt && (
+                <div className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 flex items-center justify-between text-slate-600 text-[11px]">
+                  <span>Status: <strong className="text-emerald-700">Terhubung</strong></span>
+                  <span>Terakhir Sinkron: <strong>{formatIndonesianDate(config.lastSyncedAt, true)}</strong></span>
+                </div>
+              )}
             </div>
           )}
 
@@ -467,7 +374,7 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
               <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-200">
                 <h3 className="font-bold text-blue-950 text-sm mb-1 flex items-center gap-1.5">
                   <Download className="w-4 h-4 text-blue-600" />
-                  <span>Ekspor Langsung Format Google Sheets (100% Offline)</span>
+                  <span>Ekspor Langsung Format Spreadsheet (100% Offline)</span>
                 </h3>
                 <p className="text-slate-600 text-xs leading-relaxed">
                   Anda dapat langsung mengunduh file spreadsheet siap pakai untuk langsung dibuka di Google Sheets, Microsoft
@@ -522,75 +429,6 @@ export const GoogleSheetsSync: React.FC<GoogleSheetsSyncProps> = ({
                   <span>Buka sheets.new</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: OAUTH GOOGLE API */}
-          {activeTab === 'oauth' && (
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      config.connected ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'
-                    }`}
-                  >
-                    <Cloud className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-900 text-sm">
-                      Status: {config.connected ? 'Terhubung' : 'Belum Terhubung'}
-                    </div>
-                    <div className="text-slate-500 text-[11px] mt-0.5">
-                      Terakhir Sinkron:{' '}
-                      {config.lastSyncedAt ? formatIndonesianDate(config.lastSyncedAt, true) : 'Belum pernah'}
-                    </div>
-                  </div>
-                </div>
-
-                {config.spreadsheetUrl && (
-                  <a
-                    href={config.spreadsheetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-xs shrink-0"
-                  >
-                    <FileSpreadsheet className="w-4 h-4" />
-                    <span>Buka Spreadsheet</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-                  </a>
-                )}
-              </div>
-
-              {/* Connect Button */}
-              <button
-                onClick={handleConnectWithOAuth}
-                disabled={isSyncing}
-                className="w-full py-3 bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white font-bold rounded-xl shadow-md shadow-emerald-800/20 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
-              >
-                <Cloud className="w-4 h-4" />
-                <span>{isSyncing ? 'Memproses Otorisasi Google...' : 'Hubungkan dengan Akun Google (Resmi)'}</span>
-              </button>
-
-              {/* Manual ID Input */}
-              <div className="p-4 border border-slate-200 rounded-xl space-y-2.5">
-                <h4 className="font-bold text-slate-800 text-xs">Atau Tautkan ID Spreadsheet Google yang Ada:</h4>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="https://docs.google.com/spreadsheets/d/... atau ID Spreadsheet"
-                    value={spreadsheetIdInput}
-                    onChange={(e) => setSpreadsheetIdInput(e.target.value)}
-                    className="flex-1 py-2 px-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:outline-hidden text-xs"
-                  />
-                  <button
-                    onClick={handleSaveSpreadsheetId}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-colors cursor-pointer text-xs"
-                  >
-                    Simpan ID
-                  </button>
-                </div>
               </div>
             </div>
           )}
