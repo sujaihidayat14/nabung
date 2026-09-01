@@ -24,8 +24,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   const [activeTab, setActiveTab] = useState<'admin' | 'parent'>('admin');
 
   // Admin form
-  const [adminUsername, setAdminUsername] = useState('admin');
-  const [adminPassword, setAdminPassword] = useState('admin123');
+  const [adminUsername, setAdminUsername] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
 
   // Parent form
   const [parentIdentifier, setParentIdentifier] = useState('');
@@ -53,7 +53,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
         onClose();
       }, 400);
     } else {
-      setErrorMsg('Username atau Password Admin salah. (Default: admin / admin123)');
+      setErrorMsg('Username atau Password Admin salah. Silakan periksa kembali.');
     }
   };
 
@@ -62,7 +62,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     setErrorMsg('');
 
     if (!parentIdentifier.trim()) {
-      setErrorMsg('Silakan masukkan Nama Siswa atau NISN / NIDN anak');
+      setErrorMsg('Silakan masukkan Nama Siswa atau NISN anak');
       return;
     }
 
@@ -74,7 +74,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
 
     const expectedPassword = student.password || '123456';
     if (parentPassword !== expectedPassword) {
-      setErrorMsg(`Password salah untuk ananda ${student.name}. (Password default awal: 123456)`);
+      setErrorMsg(`Password salah untuk akun ananda ${student.name}.`);
       return;
     }
 
@@ -90,14 +90,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       onClose();
     }, 400);
   };
-
-  const handleQuickDemoParent = (std: Student) => {
-    setParentIdentifier(std.nisn);
-    setParentPassword(std.password || '123456');
-    setErrorMsg('');
-  };
-
-  const demoStudents = StorageService.getStudents().slice(0, 4);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
@@ -128,7 +120,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 setActiveTab('admin');
                 setErrorMsg('');
               }}
-              className={`py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'admin'
                   ? 'bg-white text-emerald-900 shadow-xs'
                   : 'text-emerald-100 hover:bg-white/10'
@@ -143,7 +135,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 setActiveTab('parent');
                 setErrorMsg('');
               }}
-              className={`py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 activeTab === 'parent'
                   ? 'bg-white text-emerald-900 shadow-xs'
                   : 'text-emerald-100 hover:bg-white/10'
@@ -184,7 +176,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     value={adminUsername}
                     onChange={(e) => setAdminUsername(e.target.value)}
                     required
-                    placeholder="admin"
+                    placeholder="Masukkan username"
                     className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:border-transparent"
                   />
                 </div>
@@ -201,13 +193,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
                     required
-                    placeholder="admin123"
+                    placeholder="Masukkan password"
                     className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:border-transparent"
                   />
                 </div>
-                <p className="mt-1 text-[11px] text-slate-500">
-                  Password default: <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-emerald-700">admin123</code>
-                </p>
               </div>
 
               <button
@@ -233,7 +222,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     value={parentIdentifier}
                     onChange={(e) => setParentIdentifier(e.target.value)}
                     required
-                    placeholder="Contoh: Ahmad Faiz atau 0123456781"
+                    placeholder="Contoh: Nama Siswa atau NISN"
                     className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:border-transparent"
                   />
                 </div>
@@ -252,13 +241,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     value={parentPassword}
                     onChange={(e) => setParentPassword(e.target.value)}
                     required
-                    placeholder="Password awal default: 123456"
+                    placeholder="Masukkan password akun"
                     className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:border-transparent"
                   />
-                </div>
-                <div className="mt-1 flex items-center justify-between text-[11px] text-slate-500">
-                  <span>Password awal: <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-emerald-700">123456</code></span>
-                  <span className="text-emerald-700">Dapat diubah setelah login</span>
                 </div>
               </div>
 
@@ -269,27 +254,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 <Users className="w-4 h-4" />
                 <span>Lihat Tabungan Siswa</span>
               </button>
-
-              {/* Demo Quick Login Helper */}
-              <div className="mt-4 pt-3 border-t border-slate-100">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 mb-2">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Pilih Contoh Akun Siswa (Demo Langsung):</span>
-                </div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {demoStudents.map((std) => (
-                    <button
-                      key={std.id}
-                      type="button"
-                      onClick={() => handleQuickDemoParent(std)}
-                      className="text-left p-1.5 rounded-lg border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 text-[11px] transition-colors"
-                    >
-                      <div className="font-semibold text-slate-800 truncate">{std.name}</div>
-                      <div className="text-[10px] text-slate-500">{std.className} • NISN: {std.nisn.slice(-4)}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
             </form>
           )}
         </div>

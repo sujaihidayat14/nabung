@@ -55,7 +55,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
       }
       const currentSaved = student.password || '123456';
       if (oldPassword !== currentSaved) {
-        setErrorMsg('Password lama salah. (Password awal default: 123456)');
+        setErrorMsg('Password lama salah. Silakan periksa kembali.');
         return;
       }
       student.password = newPassword;

@@ -46,7 +46,7 @@ export const StudentManager: React.FC<StudentManagerProps> = ({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [passwordResetStudent, setPasswordResetStudent] = useState<Student | null>(null);
-  const [newPasswordValue, setNewPasswordValue] = useState('123456');
+  const [newPasswordValue, setNewPasswordValue] = useState('');
 
   // New / Edit Student Form
   const [formNisn, setFormNisn] = useState('');
@@ -207,13 +207,29 @@ Bendahara Kas Tabungan ${school.name}`;
 
   const handleResetPassword = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!passwordResetStudent || !newPasswordValue) return;
+    if (!passwordResetStudent || !newPasswordValue.trim()) {
+      alert('Silakan masukkan password baru.');
+      return;
+    }
 
-    const updated = { ...passwordResetStudent, password: newPasswordValue };
+    const updated = { ...passwordResetStudent, password: newPasswordValue.trim() };
     StorageService.updateStudent(updated);
     setPasswordResetStudent(null);
+    setNewPasswordValue('');
     onRefresh();
-    alert(`Password akun wali/siswa ${updated.name} berhasil diubah menjadi: ${newPasswordValue}`);
+    alert(`Password akun wali/siswa ananda ${updated.name} berhasil diperbarui.`);
+  };
+
+  const handleClearDemoData = () => {
+    const isConfirmed = window.confirm(
+      'Apakah Anda ingin mengosongkan seluruh data contoh (siswa & mutasi transaksi) agar buku kas tabungan bersih dan siap diisi data siswa riil SDN 5 JURIT BARU?'
+    );
+    if (isConfirmed) {
+      StorageService.saveStudents([]);
+      StorageService.saveTransactions([]);
+      onRefresh();
+      alert('Data contoh berhasil dikosongkan. Sekarang Anda dapat menambah siswa riil atau mengimpor file Excel!');
+    }
   };
 
   const handleExportStudentsExcel = () => {
@@ -335,6 +351,17 @@ Bendahara Kas Tabungan ${school.name}`;
             <span>Import Excel</span>
             <input type="file" accept=".xlsx, .xls, .csv" onChange={handleImportExcel} className="hidden" />
           </label>
+
+          {students.length > 0 && (
+            <button
+              onClick={handleClearDemoData}
+              className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-semibold border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Kosongkan Data Contoh untuk Memulai Pencatatan Kas Riil"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Kosongkan Data Contoh</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -500,7 +527,7 @@ Bendahara Kas Tabungan ${school.name}`;
                           <button
                             onClick={() => {
                               setPasswordResetStudent(student);
-                              setNewPasswordValue(student.password || '123456');
+                              setNewPasswordValue('');
                             }}
                             className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg border border-amber-200 transition-colors"
                             title="Ubah Password Akun Siswa/Wali"
